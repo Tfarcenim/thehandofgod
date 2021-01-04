@@ -8,12 +8,16 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import tfar.thehandofgod.network.PacketHandler;
-import tfar.thehandofgod.network.S2CLoadShaderPacket;
+import tfar.thehandofgod.network.S2CStopTimePacket;
+
+import java.util.UUID;
 
 public class HandoOfGodData extends WorldSavedData {
 
     public boolean stopped;
     public int oldTickSpeed;
+    //the user who activated time stop
+    public UUID user;
 
     //this is called via reflection, do not remove
     public HandoOfGodData(String name) {
@@ -40,34 +44,37 @@ public class HandoOfGodData extends WorldSavedData {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         stopped = nbt.getBoolean("stopped");
+        user = nbt.getUniqueId("user");
         oldTickSpeed = nbt.getInteger("oldTickSpeed");
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound.setBoolean("stopped",stopped);
+        compound.setUniqueId("user",user);
         compound.setInteger("oldTickSpeed",oldTickSpeed);
         return compound;
     }
 
-    public void toggle(WorldServer serverWorld) {
+    public void toggle(WorldServer serverWorld, EntityPlayerMP serverPlayer) {
         this.stopped = !stopped;
         if (stopped) {
-            onStopped(serverWorld);
+            onStopped(serverWorld,serverPlayer);
         } else {
             onResume(serverWorld);
         }
         markDirty();
     }
 
-    public void onStopped(WorldServer serverWorld) {
+    public void onStopped(WorldServer serverWorld, EntityPlayerMP serverPlayer) {
         oldTickSpeed = serverWorld.getGameRules().getInt("randomTickSpeed");
+        user = serverPlayer.getGameProfile().getId();
         serverWorld.getGameRules().setOrCreateGameRule("randomTickSpeed","0");
         serverWorld.getGameRules().setOrCreateGameRule("doDaylightCycle","false");
 
         for (Entity entity : serverWorld.loadedEntityList) {
             if (entity instanceof EntityPlayer) {
-                PacketHandler.INSTANCE.sendTo(new S2CLoadShaderPacket(false),(EntityPlayerMP)entity);
+                PacketHandler.INSTANCE.sendTo(new S2CStopTimePacket(true,((EntityPlayer)entity).getGameProfile().getId().equals(user)),(EntityPlayerMP)entity);
             }
             entity.updateBlocked = true;
         }
@@ -79,7 +86,7 @@ public class HandoOfGodData extends WorldSavedData {
 
         for (Entity entity : serverWorld.loadedEntityList) {
             if (entity instanceof EntityPlayer) {
-                PacketHandler.INSTANCE.sendTo(new S2CLoadShaderPacket(true),(EntityPlayerMP)entity);
+                PacketHandler.INSTANCE.sendTo(new S2CStopTimePacket(false,false),(EntityPlayerMP)entity);
             }
             entity.updateBlocked = false;
         }

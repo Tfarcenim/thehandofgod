@@ -1,0 +1,14 @@
+{
+  "time_stop": {
+    "sounds": [
+      "thehandofgod:time_stop"
+    ]
+  },
+  "time_start": {
+    "sounds": [
+      {
+        "name": "thehandofgod:time_start"
+      }
+    ]
+  }
+}

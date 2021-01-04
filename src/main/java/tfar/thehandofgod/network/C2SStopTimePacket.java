@@ -12,7 +12,6 @@ import tfar.thehandofgod.HandoOfGodData;
 
 public class C2SStopTimePacket implements IMessage {
 
-
   public C2SStopTimePacket(){}
 
   /**
@@ -44,7 +43,7 @@ public class C2SStopTimePacket implements IMessage {
     private void handle(C2SStopTimePacket message, MessageContext ctx) {
       EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
       WorldServer serverWorld = (WorldServer) ctx.getServerHandler().player.world;
-      HandoOfGodData.getDefaultInstance(serverWorld).toggle(serverWorld);
+      HandoOfGodData.getDefaultInstance(serverWorld).toggle(serverWorld,serverPlayer);
     }
   }
 }
