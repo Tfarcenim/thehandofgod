@@ -1,6 +1,7 @@
 package tfar.thehandofgod;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
@@ -29,6 +30,11 @@ public class TheHandOfGod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PacketHandler.registerMessages(MODID);
+    }
+
+    @SubscribeEvent
+    public static void items(RegistryEvent.Register<Item> e) {
+        ModItems.register(e.getRegistry());
     }
 
     @SubscribeEvent

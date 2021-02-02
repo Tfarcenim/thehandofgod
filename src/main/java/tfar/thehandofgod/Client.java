@@ -1,13 +1,16 @@
 package tfar.thehandofgod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -26,6 +29,11 @@ public class Client {
     @SubscribeEvent
     public static void client(ModelRegistryEvent e) {
         ClientRegistry.registerKeyBinding(time_stop);
+        setModel(ModItems.HAND_OF_GOD);
+    }
+
+    public static void setModel(Item item) {
+        ModelLoader.setCustomModelResourceLocation(item,0,new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
     @SubscribeEvent
