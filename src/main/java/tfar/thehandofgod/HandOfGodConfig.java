@@ -22,6 +22,9 @@ public class HandOfGodConfig {
     @Config.Name("allowed_potions")
     public static String[] allowed_potions = getDefaultPotions();
 
+    @Config.Name("break_radius")
+    public static int break_radius = 1;
+
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()
                 .filter(Potion::isBeneficial)
