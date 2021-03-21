@@ -1,19 +1,28 @@
 package tfar.thehandofgod;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.PotionEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.Logger;
 import tfar.thehandofgod.network.PacketHandler;
 import tfar.thehandofgod.network.S2CStopTimePacket;
@@ -30,6 +39,15 @@ public class TheHandOfGod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PacketHandler.registerMessages(MODID);
+        HandOfGodConfig.parseConfigs();
+    }
+
+    @SubscribeEvent
+    public static void attack(LivingAttackEvent e) {
+        EntityLivingBase victim = e.getEntityLiving();
+        if (Util.hasHand(victim)) {
+            e.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
@@ -40,6 +58,18 @@ public class TheHandOfGod {
     @SubscribeEvent
     public static void sounds(RegistryEvent.Register<SoundEvent> e) {
         ModSounds.register(e.getRegistry());
+    }
+
+    @SubscribeEvent
+    public static void configs(ConfigChangedEvent.OnConfigChangedEvent e) {
+        HandOfGodConfig.parseConfigs();
+    }
+
+    @SubscribeEvent
+    public static void potionFilter(PotionEvent.PotionApplicableEvent e) {
+        if (Util.hasHand(e.getEntityLiving()) && !HandOfGodConfig.allowed.contains(e.getPotionEffect().getPotion())) {
+            e.setResult(Event.Result.DENY);
+        }
     }
 
     @SubscribeEvent
@@ -67,6 +97,34 @@ public class TheHandOfGod {
             boolean stopped = HandoOfGodData.getDefaultInstance((WorldServer)e.getWorld()).stopped;
             if (stopped) {
                 e.getEntity().updateBlocked = true;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerTick(TickEvent.PlayerTickEvent e) {
+        if (e.phase == TickEvent.Phase.START && !e.player.world.isRemote) {
+            for (ItemStack stack : e.player.inventory.mainInventory) {
+                if (stack.getItem() instanceof HandOfGodItem) {
+                    if (!stack.hasTagCompound() || !stack.getTagCompound().hasUniqueId("owner")) {
+                        if (!stack.hasTagCompound()) {
+                            stack.setTagCompound(new NBTTagCompound());
+                        }
+                        stack.getTagCompound().setUniqueId("owner",e.player.getGameProfile().getId());
+                        stack.getTagCompound().setString("owner_name",e.player.getDisplayNameString());
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void pickup(EntityItemPickupEvent e) {
+        ItemStack stack = e.getItem().getItem();
+        if (stack.getItem() instanceof HandOfGodItem && stack.hasTagCompound() && stack.getTagCompound().hasUniqueId("owner")) {
+            boolean isOwner = e.getEntityPlayer().getGameProfile().getId().equals(stack.getTagCompound().getUniqueId("owner"));
+            if (!isOwner) {
+                e.setCanceled(true);
             }
         }
     }

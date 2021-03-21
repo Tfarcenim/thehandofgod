@@ -2,6 +2,8 @@ package tfar.thehandofgod;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -43,5 +45,15 @@ public class Util {
             }
         }
         return coneEntities;
+    }
+
+    private static final ItemStack HAND = new ItemStack(ModItems.HAND_OF_GOD);
+
+    public static boolean hasHand(EntityLivingBase entity) {
+        if (entity instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer)entity;
+            return player.inventory.hasItemStack(HAND);
+        }
+        return false;
     }
 }

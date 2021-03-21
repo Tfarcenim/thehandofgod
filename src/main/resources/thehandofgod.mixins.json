@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "tfar.thehandofgod.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "thehandofgod.refmap.json",
+  "mixins": [
+    "PlayerInventoryMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

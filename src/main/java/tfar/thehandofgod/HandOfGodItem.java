@@ -1,5 +1,6 @@
 package tfar.thehandofgod;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -10,6 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class HandOfGodItem extends Item {
@@ -28,10 +30,23 @@ public class HandOfGodItem extends Item {
     }
 
     @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        if (stack.hasTagCompound() && stack.getTagCompound().hasUniqueId("owner")) {
+            tooltip.add("Owned by "+stack.getTagCompound().getString("owner_name"));
+        }
+    }
+
+    @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
         List<Entity> coneEntities = Util.getEntitiesInCone(player);
         entity.setDead();
         coneEntities.forEach(Entity::setDead);
         return true;
+    }
+
+    @Override
+    public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {
+        return false;
     }
 }
