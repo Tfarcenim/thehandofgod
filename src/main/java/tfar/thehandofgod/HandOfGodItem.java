@@ -16,10 +16,10 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import tfar.thehandofgod.util.Util;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Set;
 
 public class HandOfGodItem extends Item {
 

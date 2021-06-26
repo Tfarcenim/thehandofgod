@@ -11,5 +11,8 @@ public class PacketHandler {
     INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
     INSTANCE.registerMessage(C2SStopTimePacket.Handler.class, C2SStopTimePacket.class, 0, Side.SERVER);
     INSTANCE.registerMessage(S2CStopTimePacket.Handler.class, S2CStopTimePacket.class, 1, Side.CLIENT);
+
+    INSTANCE.registerMessage(C2SKeybindPacket.Handler.class, C2SKeybindPacket.class, 2, Side.SERVER);
+
   }
 }

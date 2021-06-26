@@ -5,7 +5,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -16,16 +15,23 @@ import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tfar.thehandofgod.client.ModKeybinds;
 import tfar.thehandofgod.network.PacketHandler;
 import tfar.thehandofgod.network.S2CStopTimePacket;
+import tfar.thehandofgod.util.Util;
 
 @Mod(modid = TheHandOfGod.MODID, name = TheHandOfGod.NAME, version = TheHandOfGod.VERSION)
 @Mod.EventBusSubscriber
@@ -34,12 +40,26 @@ public class TheHandOfGod {
     public static final String NAME = "The Hand of God";
     public static final String VERSION = "1.0";
 
-    private static Logger logger;
+    public static Logger logger = LogManager.getLogger();
+
+    public static TheHandOfGod INSTANCE;
+
+    public TheHandOfGod() {
+        INSTANCE = this;
+    }
+
+    @EventHandler
+    public void preInit(final FMLPreInitializationEvent event) {
+        NetworkRegistry.INSTANCE.registerGuiHandler(this,new GuiHandler());
+    }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PacketHandler.registerMessages(MODID);
         HandOfGodConfig.parseConfigs();
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            ModKeybinds.clientSetup();
+        }
     }
 
     @SubscribeEvent

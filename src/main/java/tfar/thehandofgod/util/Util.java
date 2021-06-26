@@ -1,4 +1,4 @@
-package tfar.thehandofgod;
+package tfar.thehandofgod.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import tfar.thehandofgod.HandOfGodConfig;
+import tfar.thehandofgod.ModItems;
 
 import java.util.ArrayList;
 import java.util.List;

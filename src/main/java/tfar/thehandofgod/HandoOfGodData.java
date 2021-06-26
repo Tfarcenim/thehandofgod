@@ -28,7 +28,7 @@ public class HandoOfGodData extends WorldSavedData {
         return get(world.getMinecraftServer().getWorld(0));
     }
 
-    public static HandoOfGodData get(WorldServer world) {
+    private static HandoOfGodData get(WorldServer world) {
         MapStorage storage = world.getPerWorldStorage();
         String name = TheHandOfGod.MODID+":"+world.provider.getDimension();
         HandoOfGodData instance = (HandoOfGodData) storage.getOrLoadData(HandoOfGodData.class, name);
