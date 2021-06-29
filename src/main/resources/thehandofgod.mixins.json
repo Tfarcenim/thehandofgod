@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "thehandofgod.refmap.json",
   "mixins": [
+    "EntityPlayerMPMixin",
+    "EntityPlayerSPMixin",
     "PlayerInventoryMixin"
   ],
   "client": [

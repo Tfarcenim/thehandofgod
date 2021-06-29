@@ -25,6 +25,12 @@ public class HandOfGodConfig {
     @Config.Name("break_radius")
     public static int break_radius = 1;
 
+    @Config.Name("inertia_cancellation")
+    public static boolean inertia_cancellation = true;
+
+    @Config.Name("true_invisibility")
+    public static boolean true_invisibility = true;
+
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()
                 .filter(Potion::isBeneficial)

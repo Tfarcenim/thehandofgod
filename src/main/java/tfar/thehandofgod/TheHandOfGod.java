@@ -123,16 +123,35 @@ public class TheHandOfGod {
 
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent e) {
-        if (e.phase == TickEvent.Phase.START && !e.player.world.isRemote) {
-            for (ItemStack stack : e.player.inventory.mainInventory) {
-                if (stack.getItem() instanceof HandOfGodItem) {
-                    if (!stack.hasTagCompound() || !stack.getTagCompound().hasUniqueId("owner")) {
-                        if (!stack.hasTagCompound()) {
-                            stack.setTagCompound(new NBTTagCompound());
+        if (e.phase == TickEvent.Phase.START) {
+            if (!e.player.world.isRemote) {
+                for (ItemStack stack : e.player.inventory.mainInventory) {
+                    if (stack.getItem() instanceof HandOfGodItem) {
+                        if (!stack.hasTagCompound() || !stack.getTagCompound().hasUniqueId("owner")) {
+                            if (!stack.hasTagCompound()) {
+                                stack.setTagCompound(new NBTTagCompound());
+                            }
+                            stack.getTagCompound().setUniqueId("owner", e.player.getGameProfile().getId());
+                            stack.getTagCompound().setString("owner_name", e.player.getDisplayNameString());
                         }
-                        stack.getTagCompound().setUniqueId("owner",e.player.getGameProfile().getId());
-                        stack.getTagCompound().setString("owner_name",e.player.getDisplayNameString());
                     }
+                }
+            }
+
+            if (Util.hasHand(e.player)) {
+                e.player.capabilities.allowFlying = true;
+                e.player.setInvisible(HandOfGodConfig.true_invisibility);
+                if (!e.player.world.isRemote) {
+                }
+                if (HandOfGodConfig.inertia_cancellation && e.player.moveForward == 0 && e.player.moveStrafing == 0 && e.player.capabilities.isFlying) {
+                    e.player.motionX *= 0.5;
+                    e.player.motionZ *= 0.5;
+                }
+            } else {
+                e.player.capabilities.allowFlying = false;
+                e.player.setInvisible(false);
+
+                if (!e.player.world.isRemote) {
                 }
             }
         }
