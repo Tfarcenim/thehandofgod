@@ -19,7 +19,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -58,7 +57,7 @@ public class TheHandOfGod {
         PacketHandler.registerMessages(MODID);
         HandOfGodConfig.parseConfigs();
         if (FMLCommonHandler.instance().getSide().isClient()) {
-            ModKeybinds.clientSetup();
+            ModKeybinds.register();
         }
     }
 

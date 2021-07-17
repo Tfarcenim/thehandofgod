@@ -1,10 +1,8 @@
-package tfar.thehandofgod;
+package tfar.thehandofgod.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -16,19 +14,19 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Keyboard;
+import tfar.thehandofgod.ModItems;
+import tfar.thehandofgod.ModSounds;
+import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.network.C2SStopTimePacket;
 import tfar.thehandofgod.network.PacketHandler;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class Client {
 
-    public static final KeyBinding time_stop = new KeyBinding("time_stop", Keyboard.KEY_Y, TheHandOfGod.MODID);
     public static boolean stopped;
 
     @SubscribeEvent
     public static void client(ModelRegistryEvent e) {
-        ClientRegistry.registerKeyBinding(time_stop);
         setModel(ModItems.HAND_OF_GOD);
     }
 
@@ -38,7 +36,7 @@ public class Client {
 
     @SubscribeEvent
     public static void keyPress(InputEvent.KeyInputEvent e) {
-        while (time_stop.isPressed()) {
+        while (ModKeybinds.TIME_STOP.isPressed()) {
             SoundEvent sound = stopped ? ModSounds.TIME_START : ModSounds.TIME_STOP;
             Minecraft.getMinecraft().world.playSound(Minecraft.getMinecraft().player,Minecraft.getMinecraft().player.getPosition(),
                     sound, SoundCategory.BLOCKS, 1.2F, 1);

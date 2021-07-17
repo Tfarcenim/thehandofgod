@@ -1,4 +1,4 @@
-package tfar.thehandofgod;
+package tfar.thehandofgod.menu;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -10,16 +10,11 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class BackpackContainer extends Container {
     public final IInventory playerInventory;
-    /**
-     * On the server, this may be a {@link net.minecraft.tileentity.TileEntityChest} (corresponding to a single chest
-     * block) or an {@link net.minecraft.inventory.InventoryLargeChest} (corresponding to a large chest); chests larger
-     * than 2 chest blocks are represented by several nested InventoryLargeChests. See {@link
-     * net.minecraft.block.BlockChest#getContainer()} for more information. On the client, this is an InventoryBasic.
-     */
+
     public final ItemStackHandler stackHandler;
     private final int numRows;
 
-    public BackpackContainer(IInventory playerInventory, ItemStackHandler chestInventory, EntityPlayer player) {
+    public BackpackContainer(IInventory playerInventory, ItemStackHandler chestInventory) {
         this.playerInventory = playerInventory;
         this.stackHandler = chestInventory;
         this.numRows = 6;

@@ -4,18 +4,21 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
-import tfar.thehandofgod.BackpackContainer;
+import tfar.thehandofgod.menu.BackpackContainer;
 
 public class BackpackScreen extends GuiContainer {
 
-    /** The ResourceLocation containing the chest GUI texture. */
+    /**
+     * The ResourceLocation containing the chest GUI texture.
+     */
     private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
     private final IInventory playerInventory;
-    /** Window height is calculated with these values; the more rows, the higher */
+    /**
+     * Window height is calculated with these values; the more rows, the higher
+     */
     private final int inventoryRows;
 
-    public BackpackScreen(BackpackContainer container)
-    {
+    public BackpackScreen(BackpackContainer container) {
         super(container);
         this.playerInventory = container.playerInventory;
         this.allowUserInput = false;
@@ -28,8 +31,7 @@ public class BackpackScreen extends GuiContainer {
     /**
      * Draws the screen and all the components in it.
      */
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
@@ -38,8 +40,7 @@ public class BackpackScreen extends GuiContainer {
     /**
      * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString(/*this.handler.getDisplayName().getUnformattedText()*/"test", 8, 6, 0x404040);
         this.fontRenderer.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 0x404040);
     }

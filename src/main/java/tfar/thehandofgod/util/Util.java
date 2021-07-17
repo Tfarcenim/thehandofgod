@@ -2,10 +2,16 @@ package tfar.thehandofgod.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentDamage;
+import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.tileentity.TileEntity;
@@ -13,11 +19,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.ModItems;
+import tfar.thehandofgod.inventory.EnchantmentItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Util {
 
@@ -128,5 +137,22 @@ public class Util {
             //ActuallyAdditions.PROXY.sendBreakPacket(pos);
             return true;
         }
+    }
+
+
+    public static ItemStackHandler getEnchantmentHandler(ItemStack stack) {
+        ItemStackHandler handler = new EnchantmentItemStackHandler(9);
+        Map<Enchantment, Integer> data = EnchantmentHelper.getEnchantments(stack);
+        int i = 0;
+        for (Map.Entry<Enchantment,Integer> entry : data.entrySet()) {
+            ItemStack stack1 = createBookFromEnchantment(entry.getKey(),entry.getValue());
+            handler.setStackInSlot(i,stack1);
+            i++;
+        }
+        return handler;
+    }
+
+    public static ItemStack createBookFromEnchantment(Enchantment enchantment ,int level) {
+        return ItemEnchantedBook.getEnchantedItemStack(new EnchantmentData(enchantment,level));
     }
 }

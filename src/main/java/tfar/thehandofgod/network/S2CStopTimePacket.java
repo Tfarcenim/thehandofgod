@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import tfar.thehandofgod.Client;
+import tfar.thehandofgod.client.Client;
 
 public class S2CStopTimePacket implements IMessage {
 

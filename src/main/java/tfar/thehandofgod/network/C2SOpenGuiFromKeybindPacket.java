@@ -9,19 +9,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.util.Constants;
 
-public class C2SKeybindPacket implements IMessage {
+public class C2SOpenGuiFromKeybindPacket implements IMessage {
 
-    private Constants.KeybindType type;
+    private Constants.ScreenType type;
 
-    public C2SKeybindPacket(){}
+    public C2SOpenGuiFromKeybindPacket(){}
 
-    public C2SKeybindPacket(Constants.KeybindType type) {
+    public C2SOpenGuiFromKeybindPacket(Constants.ScreenType type) {
         this.type = type;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        type = Constants.KeybindType.values()[buf.readInt()];
+        type = Constants.ScreenType.values()[buf.readInt()];
     }
 
     @Override
@@ -29,24 +29,16 @@ public class C2SKeybindPacket implements IMessage {
         buf.writeInt(type.ordinal());
     }
 
-    public static class Handler implements IMessageHandler<C2SKeybindPacket, IMessage> {
+    public static class Handler implements IMessageHandler<C2SOpenGuiFromKeybindPacket, IMessage> {
         @Override
-        public IMessage onMessage(C2SKeybindPacket message, MessageContext ctx) {
+        public IMessage onMessage(C2SOpenGuiFromKeybindPacket message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(C2SKeybindPacket message, MessageContext ctx) {
+        private void handle(C2SOpenGuiFromKeybindPacket message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().player;
-
-            switch (message.type) {
-                case BACKPACK:
-                    player.openGui(TheHandOfGod.INSTANCE, 0, player.world,0, 0, 0);
-                    break;
-            }
-
-
+            player.openGui(TheHandOfGod.INSTANCE,message.type.ordinal(), player.world,0, 0, 0);
         }
     }
-
 }
