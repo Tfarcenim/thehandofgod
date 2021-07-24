@@ -1,20 +1,22 @@
 package tfar.thehandofgod.menu;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import tfar.thehandofgod.inventory.AutoSaveItemStackHandler;
 
 public class BackpackContainer extends Container {
-    public final IInventory playerInventory;
+    public final InventoryPlayer playerInventory;
 
     public final ItemStackHandler stackHandler;
     private final int numRows;
+    private int page;
 
-    public BackpackContainer(IInventory playerInventory, ItemStackHandler chestInventory) {
+    public BackpackContainer(InventoryPlayer playerInventory, ItemStackHandler chestInventory) {
         this.playerInventory = playerInventory;
         this.stackHandler = chestInventory;
         this.numRows = 6;
@@ -42,6 +44,13 @@ public class BackpackContainer extends Container {
      */
     public boolean canInteractWith(EntityPlayer playerIn) {
         return true;//this.stackHandler.isUsableByPlayer(playerIn);
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+        if (!playerInventory.player.world.isRemote) {
+            ((AutoSaveItemStackHandler)stackHandler).setPage(page);
+        }
     }
 
     /**
@@ -72,5 +81,9 @@ public class BackpackContainer extends Container {
         }
 
         return itemstack;
+    }
+
+    public int getPage() {
+        return page;
     }
 }

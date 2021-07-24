@@ -9,6 +9,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.inventory.ItemStackHandlerManager;
 
@@ -21,8 +22,6 @@ public class BackpackData extends WorldSavedData {
 
     //each player has 10000 pages of inventory
     private final Map<UUID, ItemStackHandlerManager> storage = new HashMap<>();
-
-    private World world;
 
     public BackpackData(String name) {
         super(name);
@@ -47,7 +46,6 @@ public class BackpackData extends WorldSavedData {
             instance = (BackpackData) storage.getOrLoadData(BackpackData.class, name);
         }
 
-        instance.world = world;
         return instance;
     }
 
@@ -59,7 +57,7 @@ public class BackpackData extends WorldSavedData {
             NBTTagCompound compound = (NBTTagCompound)nbtBase;
             UUID uuid = compound.getUniqueId("uuid");
             NBTTagList tagList = compound.getTagList("ItemStackHandlers", Constants.NBT.TAG_COMPOUND);
-            ItemStackHandlerManager manager = new ItemStackHandlerManager(world);
+            ItemStackHandlerManager manager = new ItemStackHandlerManager(FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0));
             manager.load(tagList);
             storage.put(uuid,manager);
         }

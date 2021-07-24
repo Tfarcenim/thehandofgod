@@ -8,10 +8,27 @@ import tfar.thehandofgod.world.saveddata.BackpackData;
 public class AutoSaveItemStackHandler extends ItemStackHandler {
 
     private final World world;
+    private int page;
+    private final ItemStackHandlerManager manager;
 
-    public AutoSaveItemStackHandler(int size, World world) {
+    public AutoSaveItemStackHandler(int size, World world,int initialPage,ItemStackHandlerManager manager) {
         super(size);
         this.world = world;
+        this.page = initialPage;
+        this.manager = manager;
+        this.stacks = manager.stacksStacks.get(page);
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+        if (page >= manager.stacksStacks.size()) {
+            manager.addPage();
+        }
+        this.stacks = manager.stacksStacks.get(page);
+    }
+
+    public int getPage() {
+        return page;
     }
 
     @Override
