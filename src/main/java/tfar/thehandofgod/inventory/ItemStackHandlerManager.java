@@ -7,7 +7,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.TheHandOfGod;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class ItemStackHandlerManager {
         this.world = world;
     }
 
-    public ItemStackHandler getOrCreateHandlerForPage(int page) {
+    public BiggerItemStackHandler getOrCreateHandlerForPage(int page) {
         if (!validPage(page)) {
             TheHandOfGod.logger.warn("Invalid page selected: {}", page);
             return null;
@@ -55,7 +54,9 @@ public class ItemStackHandlerManager {
             if (!stacks.get(i).isEmpty()) {
                 NBTTagCompound itemTag = new NBTTagCompound();
                 itemTag.setInteger("Slot", i);
-                stacks.get(i).writeToNBT(itemTag);
+                ItemStack stack = stacks.get(i);
+                stack.writeToNBT(itemTag);
+                itemTag.setInteger("ExtendedCount", stack.getCount());
                 nbtTagList.appendTag(itemTag);
             }
         }
@@ -84,6 +85,9 @@ public class ItemStackHandlerManager {
             int slot = itemTags.getInteger("Slot");
             if (slot >= 0 && slot < size) {
                 ItemStack stack = new ItemStack(itemTags);
+                if (itemTags.hasKey("ExtendedCount", Constants.NBT.TAG_INT)) {
+                    stack.setCount(itemTags.getInteger("ExtendedCount"));
+                }
                 handler.set(slot, stack);
             }
         }

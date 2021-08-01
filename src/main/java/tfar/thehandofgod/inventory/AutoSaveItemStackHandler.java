@@ -2,10 +2,9 @@ package tfar.thehandofgod.inventory;
 
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.world.saveddata.BackpackData;
 
-public class AutoSaveItemStackHandler extends ItemStackHandler {
+public class AutoSaveItemStackHandler extends BiggerItemStackHandler {
 
     private final World world;
     private int page;

@@ -45,10 +45,8 @@ jar.manifest.attributes(
 )
 
 repositories {
-    mavenCentral()
-    maven {
-        url 'http://maven.blamejared.com'
-    }
+  //  mavenCentral()
+
     maven { url = 'https://repo.spongepowered.org/maven' }
 }
 
@@ -94,6 +92,11 @@ processResources {
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+    jar {
+        manifest {
+            attributes 'FMLAT': 'thehandofgod_at.cfg'
+        }
     }
 }
 

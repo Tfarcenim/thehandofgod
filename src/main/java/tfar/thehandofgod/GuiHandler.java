@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.client.gui.BackpackScreen;
 import tfar.thehandofgod.client.gui.ConfigureEnchantmentScreen;
+import tfar.thehandofgod.inventory.BiggerItemStackHandler;
 import tfar.thehandofgod.inventory.EnchantmentItemStackHandler;
 import tfar.thehandofgod.menu.BackpackContainer;
 import tfar.thehandofgod.menu.ConfigureEnchantmentContainer;
@@ -28,7 +29,7 @@ public class GuiHandler implements IGuiHandler {
         switch (screenType) {
             case BACKPACK: {
                 BackpackData data = BackpackData.getDefaultInstance((WorldServer) world);
-                ItemStackHandler handler = data.getOrCreateManagerForPlayer((EntityPlayerMP) player).getOrCreateHandlerForPage(0);
+                BiggerItemStackHandler handler = data.getOrCreateManagerForPlayer((EntityPlayerMP) player).getOrCreateHandlerForPage(0);
                 return createBackpackMenu(player.inventory,handler);
             }
             case ENCHANTMENTS:
@@ -44,14 +45,14 @@ public class GuiHandler implements IGuiHandler {
         Constants.ScreenType screenType = Constants.ScreenType.values()[ID];
         switch (screenType) {
             case BACKPACK:
-                return new BackpackScreen(createBackpackMenu(player.inventory, new ItemStackHandler(54)));
+                return new BackpackScreen(createBackpackMenu(player.inventory, new BiggerItemStackHandler(54)));
             case ENCHANTMENTS:
                 return new ConfigureEnchantmentScreen(createEnchantmentMenu(player.inventory,new EnchantmentItemStackHandler(9)));
         }
         return null;
     }
 
-    private static BackpackContainer createBackpackMenu(InventoryPlayer inv, ItemStackHandler handler) {
+    private static BackpackContainer createBackpackMenu(InventoryPlayer inv, BiggerItemStackHandler handler) {
         return new BackpackContainer(inv,handler);
     }
 
