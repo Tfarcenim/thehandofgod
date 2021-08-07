@@ -32,11 +32,17 @@ public class HandOfGodConfig {
     @Config.Name("inertia_cancellation")
     public static boolean inertia_cancellation = true;
 
+    @Config.Name("flight_speed")
+    public static double flight_speed = 2;
+
     @Config.Name("true_invisibility")
     public static boolean true_invisibility = true;
 
-    @Config.Name("drop_items")
-    public static boolean drop_items = true;
+    @Config.Name("blocks_drop_items")
+    public static boolean blocks_drop_items = true;
+
+    @Config.Name("entities_drop_items")
+    public static boolean entities_drop_items = true;
 
     @Config.Name("perfect_cleanse")
     public static boolean perfect_cleanse = false;

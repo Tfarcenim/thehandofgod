@@ -1,5 +1,6 @@
 package tfar.thehandofgod;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,6 +15,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -186,8 +188,21 @@ public class TheHandOfGod {
     @SubscribeEvent
     public static void itemDrops(BlockEvent.HarvestDropsEvent e) {
         ItemStack stack = e.getHarvester().getHeldItemMainhand();
-        if (stack.getItem() instanceof HandOfGodItem && !HandOfGodConfig.drop_items) {
+        if (stack.getItem() instanceof HandOfGodItem && !HandOfGodConfig.blocks_drop_items) {
             e.getDrops().clear();
+        }
+    }
+
+    @SubscribeEvent
+    public static void entityDrops(LivingDropsEvent e) {
+        Entity attacker = e.getSource().getTrueSource();
+        if (attacker instanceof EntityLivingBase) {
+            EntityLivingBase livingEntity =  (EntityLivingBase)attacker;
+            if (Util.hasHand(livingEntity)) {
+                if (!HandOfGodConfig.entities_drop_items) {
+                    e.getDrops().clear();
+                }
+            }
         }
     }
 
