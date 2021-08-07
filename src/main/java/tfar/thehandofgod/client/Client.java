@@ -9,13 +9,16 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import tfar.thehandofgod.ModItems;
-import tfar.thehandofgod.ModSounds;
+import tfar.thehandofgod.ColoredLightningEntity;
+import tfar.thehandofgod.init.ModItems;
+import tfar.thehandofgod.init.ModSounds;
 import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.network.C2SStopTimePacket;
 import tfar.thehandofgod.network.PacketHandler;
@@ -42,6 +45,13 @@ public class Client {
                     sound, SoundCategory.BLOCKS, 1.2F, 1);
             PacketHandler.INSTANCE.sendToServer(new C2SStopTimePacket());
         }
+    }
+
+    public static void preInit(FMLPreInitializationEvent e) {
+        RenderingRegistry.registerEntityRenderingHandler(ColoredLightningEntity.class, ColoredLightningRenderer::new);
+    }
+
+    public static void init(FMLInitializationEvent e) {
     }
 
     public static void onTimeToggle(boolean stop, boolean user) {

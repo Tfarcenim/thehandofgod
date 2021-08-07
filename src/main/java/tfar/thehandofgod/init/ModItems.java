@@ -1,8 +1,9 @@
-package tfar.thehandofgod;
+package tfar.thehandofgod.init;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.registries.IForgeRegistry;
+import tfar.thehandofgod.HandOfGodItem;
 
 public class ModItems {
 

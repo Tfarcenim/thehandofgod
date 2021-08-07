@@ -53,7 +53,10 @@ public class HandOfGodItem extends Item {
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
         List<Entity> coneEntities = Util.getEntitiesInCone(player);
         entity.setDead();
-        coneEntities.forEach(Entity::setDead);
+        coneEntities.forEach(entity1 -> {
+            entity1.setDead();
+            entity1.world.addWeatherEffect(new ColoredLightningEntity(entity1.world,entity1.posX,entity1.posY,entity1.posZ,true));
+        });
         return true;
     }
 

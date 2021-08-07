@@ -1,8 +1,9 @@
-package tfar.thehandofgod;
+package tfar.thehandofgod.init;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.registries.IForgeRegistry;
+import tfar.thehandofgod.TheHandOfGod;
 
 public class ModSounds {
 

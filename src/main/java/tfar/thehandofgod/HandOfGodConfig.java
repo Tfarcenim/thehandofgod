@@ -1,9 +1,13 @@
 package tfar.thehandofgod;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.config.Config;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -31,6 +35,23 @@ public class HandOfGodConfig {
     @Config.Name("true_invisibility")
     public static boolean true_invisibility = true;
 
+    @Config.Name("drop_items")
+    public static boolean drop_items = true;
+
+    @Config.Name("perfect_cleanse")
+    public static boolean perfect_cleanse = false;
+
+    @Config.Name("omnipresence")
+    @Config.Comment("When activated, all entities in the world currently are removed and no new entities can spawn.")
+    public static boolean omnipresence = false;
+
+    @Config.Name("no_clip")
+    public static boolean no_clip = false;
+
+    @Config.Name("judgement")
+    @Config.Comment("Toggle black lightning spawning when entities are killed by the area attack.")
+    public static boolean judgement = false;
+
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()
                 .filter(Potion::isBeneficial)
@@ -41,11 +62,23 @@ public class HandOfGodConfig {
     @Config.Ignore
     public static Set<Potion> allowed = new HashSet<>();
 
-    public static void parseConfigs() {
+    public static void parseConfigs(boolean worldActive) {
         allowed.clear();
         for (String string : allowed_potions) {
             Potion potion = ForgeRegistries.POTIONS.getValue(new ResourceLocation(string));
             allowed.add(potion);
+        }
+
+        if (worldActive && perfect_cleanse) {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.getWorld(0).getGameRules().setOrCreateGameRule("doMobSpawning","false");
+            for (WorldServer serverWorld : server.worlds) {
+                for (Entity entity : serverWorld.loadedEntityList) {
+                    if (!(entity instanceof EntityPlayerMP)) {
+                        entity.setDead();
+                    }
+                }
+            }
         }
     }
 }

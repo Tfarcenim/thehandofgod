@@ -1,6 +1,7 @@
 package tfar.thehandofgod;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -25,9 +27,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tfar.thehandofgod.client.Client;
 import tfar.thehandofgod.client.ModKeybinds;
+import tfar.thehandofgod.init.ModEntityTypes;
+import tfar.thehandofgod.init.ModItems;
+import tfar.thehandofgod.init.ModSounds;
 import tfar.thehandofgod.network.PacketHandler;
 import tfar.thehandofgod.network.S2CStopTimePacket;
 import tfar.thehandofgod.util.Util;
@@ -50,14 +57,18 @@ public class TheHandOfGod {
     @EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(this,new GuiHandler());
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            Client.preInit(event);
+        }
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PacketHandler.registerMessages(MODID);
-        HandOfGodConfig.parseConfigs();
+        HandOfGodConfig.parseConfigs(false);
         if (FMLCommonHandler.instance().getSide().isClient()) {
             ModKeybinds.register();
+            Client.init(event);
         }
     }
 
@@ -80,8 +91,13 @@ public class TheHandOfGod {
     }
 
     @SubscribeEvent
+    public static void entity(RegistryEvent.Register<EntityEntry> e) {
+        ModEntityTypes.register(e.getRegistry());
+    }
+
+    @SubscribeEvent
     public static void configs(ConfigChangedEvent.OnConfigChangedEvent e) {
-        HandOfGodConfig.parseConfigs();
+        HandOfGodConfig.parseConfigs(e.isWorldRunning());
     }
 
     @SubscribeEvent
@@ -103,10 +119,16 @@ public class TheHandOfGod {
 
     @SubscribeEvent
     public static void login(PlayerEvent.PlayerLoggedInEvent e) {
-        World world = e.player.world;
+        EntityPlayer player = e.player;
+        World world = player.world;
         HandoOfGodData handoOfGodData = HandoOfGodData.getDefaultInstance((WorldServer)world);
         if (handoOfGodData.stopped) {
-            PacketHandler.INSTANCE.sendTo(new S2CStopTimePacket(true, e.player.getGameProfile().getId().equals(handoOfGodData.user)), (EntityPlayerMP) e.player);
+            PacketHandler.INSTANCE.sendTo(new S2CStopTimePacket(true, player.getGameProfile().getId().equals(handoOfGodData.user)), (EntityPlayerMP) player);
+        }
+
+        if (handoOfGodData.newToWorld(player) && HandOfGodConfig.omnipresence) {
+            player.addItemStackToInventory(new ItemStack(ModItems.HAND_OF_GOD));
+            handoOfGodData.addNewPlayer(player);
         }
     }
 
@@ -164,6 +186,21 @@ public class TheHandOfGod {
             if (!isOwner) {
                 e.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void itemDrops(BlockEvent.HarvestDropsEvent e) {
+        ItemStack stack = e.getHarvester().getHeldItemMainhand();
+        if (stack.getItem() instanceof HandOfGodItem && !HandOfGodConfig.drop_items) {
+            e.getDrops().clear();
+        }
+    }
+
+    @SubscribeEvent
+    public static void noClip(GetCollisionBoxesEvent e) {
+        if (HandOfGodConfig.no_clip) {
+            e.getCollisionBoxesList().clear();
         }
     }
 }
