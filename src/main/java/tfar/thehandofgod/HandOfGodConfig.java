@@ -50,7 +50,14 @@ public class HandOfGodConfig {
 
     @Config.Name("judgement")
     @Config.Comment("Toggle black lightning spawning when entities are killed by the area attack.")
-    public static boolean judgement = false;
+    public static boolean judgement = true;
+
+    @Config.Name("thorns")
+    @Config.Comment("Configure if entities that attack the player are automatically PK-ed")
+    public static boolean thorns = true;
+
+    @Config.Name("infinite_energy")
+    public static boolean infinite_energy = true;
 
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()

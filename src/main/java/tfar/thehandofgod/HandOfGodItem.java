@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -16,6 +17,9 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import tfar.thehandofgod.util.Util;
 
 import javax.annotation.Nullable;
@@ -37,6 +41,25 @@ public class HandOfGodItem extends Item {
     }
 
     @Override
+    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+        if (HandOfGodConfig.infinite_energy) {
+            if (!worldIn.isRemote) {
+                if (entityIn instanceof EntityPlayer) {
+                    EntityPlayer player = (EntityPlayer)entityIn;
+                    for (ItemStack stack1 :player.inventory.mainInventory) {
+                        if (stack1.hasCapability(CapabilityEnergy.ENERGY,null)) {
+                            IEnergyStorage energyStorage = stack1.getCapability(CapabilityEnergy.ENERGY,null);
+                            if (energyStorage != null) {
+                                energyStorage.receiveEnergy(Integer.MAX_VALUE,false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
         return 2;
     }
@@ -53,11 +76,15 @@ public class HandOfGodItem extends Item {
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
         List<Entity> coneEntities = Util.getEntitiesInCone(player);
         entity.setDead();
-        coneEntities.forEach(entity1 -> {
-            entity1.setDead();
-            entity1.world.addWeatherEffect(new ColoredLightningEntity(entity1.world,entity1.posX,entity1.posY,entity1.posZ,true));
-        });
+        coneEntities.forEach(HandOfGodItem::pk);
         return true;
+    }
+
+    public static void pk(Entity entity) {
+        entity.setDead();
+        if (HandOfGodConfig.judgement) {
+            entity.world.addWeatherEffect(new ColoredLightningEntity(entity.world, entity.posX, entity.posY, entity.posZ, true));
+        }
     }
 
     @Override

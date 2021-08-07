@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -69,14 +70,6 @@ public class TheHandOfGod {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             ModKeybinds.register();
             Client.init(event);
-        }
-    }
-
-    @SubscribeEvent
-    public static void attack(LivingAttackEvent e) {
-        EntityLivingBase victim = e.getEntityLiving();
-        if (Util.hasHand(victim)) {
-            e.setCanceled(true);
         }
     }
 
@@ -201,6 +194,20 @@ public class TheHandOfGod {
     public static void noClip(GetCollisionBoxesEvent e) {
         if (HandOfGodConfig.no_clip) {
             e.getCollisionBoxesList().clear();
+        }
+    }
+
+    @SubscribeEvent
+    public static void attack(LivingAttackEvent e) {
+        EntityLivingBase victim = e.getEntityLiving();
+        if (Util.hasHand(victim)) {
+            e.setCanceled(true);
+            if (HandOfGodConfig.thorns) {
+                DamageSource source = e.getSource();
+                if (source.getTrueSource() != null) {
+                    HandOfGodItem.pk(source.getTrueSource());
+                }
+            }
         }
     }
 }
