@@ -13,6 +13,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -207,6 +208,18 @@ public class TheHandOfGod {
                 if (source.getTrueSource() != null) {
                     HandOfGodItem.pk(source.getTrueSource());
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void death(LivingDeathEvent e) {
+        EntityLivingBase victim = e.getEntityLiving();
+        if (victim instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer)victim;
+            if (HandOfGodConfig.inventory_destruction) {
+                player.inventory.clear();
+                player.getInventoryEnderChest().clear();
             }
         }
     }

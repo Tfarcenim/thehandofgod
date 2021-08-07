@@ -1,10 +1,14 @@
 package tfar.thehandofgod;
 
+import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,6 +28,7 @@ import tfar.thehandofgod.util.Util;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public class HandOfGodItem extends Item {
 
@@ -195,5 +200,14 @@ public class HandOfGodItem extends Item {
             return Util.breakExtraBlock(stack, world, player, pos);
         }
         return false;
+    }
+
+    protected static final UUID REACH_DISTANCE_MODIFIER = UUID.fromString("fda5a5b8-04dd-4d77-ae58-aa07d33dee2b");
+
+    @Override
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
+        Multimap<String, AttributeModifier> multiMap = super.getItemAttributeModifiers(equipmentSlot);
+        multiMap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER, "Weapon modifier", HandOfGodConfig.block_reach_distance, 0));
+        return multiMap;
     }
 }

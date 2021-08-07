@@ -59,6 +59,13 @@ public class HandOfGodConfig {
     @Config.Name("infinite_energy")
     public static boolean infinite_energy = true;
 
+    @Config.Name("inventory_destruction")
+    @Config.Comment("Toggle inventory destruction. Clears target's inventory upon kill, including ender chests")
+    public static boolean inventory_destruction = true;
+
+    @Config.Name("block_reach_distance")
+    public static double block_reach_distance = 5;
+
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()
                 .filter(Potion::isBeneficial)
