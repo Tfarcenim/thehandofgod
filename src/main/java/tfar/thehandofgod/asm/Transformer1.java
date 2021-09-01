@@ -12,8 +12,8 @@ import java.io.File;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
-public class Transformer implements IFMLLoadingPlugin {
-    public Transformer() {
+public class Transformer1 implements IFMLLoadingPlugin {
+    public Transformer1() {
         MixinBootstrap.init();
         Mixins.addConfiguration("thehandofgod.mixins.json");
     }

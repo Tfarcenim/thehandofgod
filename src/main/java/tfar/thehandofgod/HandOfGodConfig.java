@@ -35,6 +35,12 @@ public class HandOfGodConfig {
     @Config.Name("flight_speed")
     public static double flight_speed = 2;
 
+    @Config.Name("walking_speed")
+    public static double walking_speed = 2;
+
+    @Config.Name("raytrace_fluids")
+    public static boolean raytrace_fluids = true;
+
     @Config.Name("true_invisibility")
     public static boolean true_invisibility = true;
 
@@ -46,6 +52,26 @@ public class HandOfGodConfig {
 
     @Config.Name("perfect_cleanse")
     public static boolean perfect_cleanse = false;
+
+    @Config.Name("area_kill")
+    public static boolean area_kill = true;
+
+    @Config.Name("area_kill_range")
+    public static int area_kill_range = 50;
+
+    @Config.Name("kill_aura")
+    public static boolean kill_aura = false;
+
+    @Config.Name("kill_aura_range")
+    public static double kill_aura_range = 5;
+
+    @Config.Name("kill_friendly")
+    @Config.Comment("Kills friendly entities (villagers, animals, etc)")
+    public static boolean kill_friendly = true;
+
+    @Config.Name("kill_all")
+    @Config.Comment("Kills inanimate (nonliving) entities")
+    public static boolean kill_all = true;
 
     @Config.Name("omnipresence")
     @Config.Comment("When activated, all entities in the world currently are removed and no new entities can spawn.")
@@ -71,6 +97,9 @@ public class HandOfGodConfig {
 
     @Config.Name("block_reach_distance")
     public static double block_reach_distance = 5;
+
+    @Config.Name("backpack_pages")
+    public static int backpack_pages = 10000;
 
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()

@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.TheHandOfGod;
 
 import java.util.ArrayList;
@@ -14,8 +15,7 @@ import java.util.List;
 
 public class ItemStackHandlerManager {
 
-    public static final int MAX_PAGES = 10000;
-    public final List<NonNullList<ItemStack>> stacksStacks = new ArrayList<>(MAX_PAGES);
+    public final List<NonNullList<ItemStack>> stacksStacks = new ArrayList<>(HandOfGodConfig.backpack_pages);
     private final World world;
 
     public ItemStackHandlerManager(World world) {
@@ -99,6 +99,6 @@ public class ItemStackHandlerManager {
     }
 
     public static boolean validPage(int page) {
-        return page >= 0 && page < MAX_PAGES;
+        return page >= 0 && page < HandOfGodConfig.backpack_pages;
     }
 }

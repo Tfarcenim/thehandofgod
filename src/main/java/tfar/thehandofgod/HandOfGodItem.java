@@ -2,17 +2,20 @@ package tfar.thehandofgod;
 
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -21,7 +24,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import tfar.thehandofgod.util.Util;
@@ -35,11 +37,46 @@ public class HandOfGodItem extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
         if (!worldIn.isRemote) {
-            if (playerIn.isSneaking()) {
-                int length = 64;
+            if (playerIn.isSneaking() && HandOfGodConfig.area_kill) {
+                int length = HandOfGodConfig.area_kill_range;
                 Vec3d pos = playerIn.getPositionVector();
-                List<Entity> entities = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn,new AxisAlignedBB(pos.subtract(length,length,length),pos.add(length,length,length)));
-                entities.forEach(Entity::setDead);
+                List<Entity> entities = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, new AxisAlignedBB(pos.subtract(length, length, length), pos.add(length, length, length)));
+                entities.forEach(HandOfGodItem::pk);
+            }
+        }
+
+        if (HandOfGodConfig.raytrace_fluids) {
+
+            ItemStack itemstack = playerIn.getHeldItem(handIn);
+            RayTraceResult raytraceresult = this.rayTrace(worldIn, playerIn, true);
+            ActionResult<ItemStack> ret = net.minecraftforge.event.ForgeEventFactory.onBucketUse(playerIn, worldIn, itemstack, raytraceresult);
+            if (ret != null) return ret;
+
+            if (raytraceresult == null) {
+                return new ActionResult<>(EnumActionResult.PASS, itemstack);
+            } else if (raytraceresult.typeOfHit != RayTraceResult.Type.BLOCK) {
+                return new ActionResult<>(EnumActionResult.PASS, itemstack);
+            } else {
+                BlockPos blockpos = raytraceresult.getBlockPos();
+
+                if (!worldIn.isBlockModifiable(playerIn, blockpos)) {
+                    return new ActionResult<>(EnumActionResult.FAIL, itemstack);
+                } else {
+                    if (!playerIn.canPlayerEdit(blockpos.offset(raytraceresult.sideHit), raytraceresult.sideHit, itemstack)) {
+                        return new ActionResult<>(EnumActionResult.FAIL, itemstack);
+                    } else {
+                        IBlockState iblockstate = worldIn.getBlockState(blockpos);
+
+                        if (iblockstate.getPropertyKeys().contains(BlockLiquid.LEVEL) && iblockstate.getValue(BlockLiquid.LEVEL) == 0) {
+                            worldIn.setBlockState(blockpos, Blocks.AIR.getDefaultState(), 11);
+                            playerIn.addStat(StatList.getObjectUseStats(this));
+                            playerIn.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
+                            return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
+                        } else {
+                            return new ActionResult<>(EnumActionResult.FAIL, itemstack);
+                        }
+                    }
+                }
             }
         }
         return super.onItemRightClick(worldIn, playerIn, handIn);
@@ -47,15 +84,17 @@ public class HandOfGodItem extends Item {
 
     @Override
     public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if (HandOfGodConfig.infinite_energy) {
-            if (!worldIn.isRemote) {
+        if (worldIn.isRemote) {
+
+        } else {
+            if (HandOfGodConfig.infinite_energy) {
                 if (entityIn instanceof EntityPlayer) {
-                    EntityPlayer player = (EntityPlayer)entityIn;
-                    for (ItemStack stack1 :player.inventory.mainInventory) {
-                        if (stack1.hasCapability(CapabilityEnergy.ENERGY,null)) {
-                            IEnergyStorage energyStorage = stack1.getCapability(CapabilityEnergy.ENERGY,null);
+                    EntityPlayer player = (EntityPlayer) entityIn;
+                    for (ItemStack stack1 : player.inventory.mainInventory) {
+                        if (stack1.hasCapability(CapabilityEnergy.ENERGY, null)) {
+                            IEnergyStorage energyStorage = stack1.getCapability(CapabilityEnergy.ENERGY, null);
                             if (energyStorage != null) {
-                                energyStorage.receiveEnergy(Integer.MAX_VALUE,false);
+                                energyStorage.receiveEnergy(Integer.MAX_VALUE, false);
                             }
                         }
                     }
@@ -73,7 +112,7 @@ public class HandOfGodItem extends Item {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         if (stack.hasTagCompound() && stack.getTagCompound().hasUniqueId("owner")) {
-            tooltip.add("Owned by "+stack.getTagCompound().getString("owner_name"));
+            tooltip.add("Owned by " + stack.getTagCompound().getString("owner_name"));
         }
     }
 
@@ -103,10 +142,10 @@ public class HandOfGodItem extends Item {
 
         //Block hit
         //todo client only
-        RayTraceResult ray = player.rayTrace(5,0);
+        RayTraceResult ray = player.rayTrace(5, 0);
         if (ray != null) {
             //Breaks the Blocks
-            if (!player.isSneaking() ) {
+            if (!player.isSneaking()) {
                 toReturn = this.breakBlocks(stack, HandOfGodConfig.break_radius, player.world, pos, ray.sideHit, player);
             }
         }
@@ -149,7 +188,9 @@ public class HandOfGodItem extends Item {
         float mainHardness = state.getBlockHardness(world, targetPos);
 
         //Break Middle Block first
-        if (!this.tryHarvestBlock(world, targetPos, false, stack, player)) { return false; }
+        if (!this.tryHarvestBlock(world, targetPos, false, stack, player)) {
+            return false;
+        }
 
         if (radius == 2 && side.getAxis() != EnumFacing.Axis.Y) {
             targetPos = targetPos.up();

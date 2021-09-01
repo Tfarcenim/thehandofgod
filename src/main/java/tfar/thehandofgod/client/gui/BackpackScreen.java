@@ -17,6 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Keyboard;
+import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.client.RenderItemExtended;
 import tfar.thehandofgod.client.SmallButton;
 import tfar.thehandofgod.inventory.DeepSlot;
@@ -581,7 +582,7 @@ public class BackpackScreen extends GuiContainer {
 
         int x = this.xSize /2 + 2;
 
-        this.fontRenderer.drawString(backpackContainer().getPage() + "/"+ (ItemStackHandlerManager.MAX_PAGES - 1),x,this.ySize - 94,0x404040);
+        this.fontRenderer.drawString(backpackContainer().getPage() + "/"+ (HandOfGodConfig.backpack_pages - 1),x,this.ySize - 94,0x404040);
     }
 
     /**

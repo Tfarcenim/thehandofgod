@@ -2,6 +2,9 @@ package tfar.thehandofgod;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -9,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.RegistryEvent;
@@ -43,12 +47,17 @@ import tfar.thehandofgod.network.PacketHandler;
 import tfar.thehandofgod.network.S2CStopTimePacket;
 import tfar.thehandofgod.util.Util;
 
+import java.util.List;
+import java.util.UUID;
+
 @Mod(modid = TheHandOfGod.MODID, name = TheHandOfGod.NAME, version = TheHandOfGod.VERSION)
 @Mod.EventBusSubscriber
 public class TheHandOfGod {
     public static final String MODID = "thehandofgod";
     public static final String NAME = "The Hand of God";
     public static final String VERSION = "1.0";
+
+    public static final UUID WALK_SPEED_UUID = UUID.fromString("0ea6ce8e-d2e8-11e5-ab30-625662870762");
 
     public static Logger logger = LogManager.getLogger();
 
@@ -60,7 +69,7 @@ public class TheHandOfGod {
 
     @EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
-        NetworkRegistry.INSTANCE.registerGuiHandler(this,new GuiHandler());
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         if (FMLCommonHandler.instance().getSide().isClient()) {
             Client.preInit(event);
         }
@@ -106,7 +115,7 @@ public class TheHandOfGod {
     @SubscribeEvent
     public static void neighbor(BlockEvent.NeighborNotifyEvent e) {
         if (!e.getWorld().isRemote) {
-            boolean stopped = HandoOfGodData.getDefaultInstance((WorldServer)e.getWorld()).stopped;
+            boolean stopped = HandoOfGodData.getDefaultInstance((WorldServer) e.getWorld()).stopped;
             if (stopped) {
                 e.setCanceled(true);
             }
@@ -117,7 +126,7 @@ public class TheHandOfGod {
     public static void login(PlayerEvent.PlayerLoggedInEvent e) {
         EntityPlayer player = e.player;
         World world = player.world;
-        HandoOfGodData handoOfGodData = HandoOfGodData.getDefaultInstance((WorldServer)world);
+        HandoOfGodData handoOfGodData = HandoOfGodData.getDefaultInstance((WorldServer) world);
         if (handoOfGodData.stopped) {
             PacketHandler.INSTANCE.sendTo(new S2CStopTimePacket(true, player.getGameProfile().getId().equals(handoOfGodData.user)), (EntityPlayerMP) player);
         }
@@ -131,7 +140,7 @@ public class TheHandOfGod {
     @SubscribeEvent
     public static void entityJoin(EntityJoinWorldEvent e) {
         if (!e.getWorld().isRemote) {
-            boolean stopped = HandoOfGodData.getDefaultInstance((WorldServer)e.getWorld()).stopped;
+            boolean stopped = HandoOfGodData.getDefaultInstance((WorldServer) e.getWorld()).stopped;
             if (stopped) {
                 e.getEntity().updateBlocked = true;
             }
@@ -140,6 +149,7 @@ public class TheHandOfGod {
 
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent e) {
+        EntityPlayer player = e.player;
         if (e.phase == TickEvent.Phase.START) {
             if (!e.player.world.isRemote) {
                 for (ItemStack stack : e.player.inventory.mainInventory) {
@@ -158,7 +168,33 @@ public class TheHandOfGod {
             if (Util.hasHand(e.player)) {
                 e.player.capabilities.allowFlying = true;
                 e.player.setInvisible(HandOfGodConfig.true_invisibility);
-                if (!e.player.world.isRemote) {
+                if (e.player.world.isRemote) {
+                    //caution, this is clientside only
+                    e.player.capabilities.setFlySpeed((float) (HandOfGodConfig.flight_speed * .05));
+                } else {
+
+
+                    if (HandOfGodConfig.kill_aura) {
+                        double r = HandOfGodConfig.kill_aura_range;
+                        List<EntityLivingBase> nearby = player.world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
+                        for (EntityLivingBase entityLivingBase : nearby) {
+                            entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player),1000000);
+                        }
+                    }
+
+                    IAttribute speedAttr = SharedMonsterAttributes.MOVEMENT_SPEED;
+                    if (HandOfGodConfig.walking_speed > 1) {
+                        if (player.getEntityAttribute(speedAttr).getModifier(WALK_SPEED_UUID) == null) {
+                            player.getEntityAttribute(speedAttr).applyModifier(new AttributeModifier(WALK_SPEED_UUID, speedAttr.getName(), HandOfGodConfig.walking_speed, 1));
+                        } else if (player.getEntityAttribute(speedAttr).getModifier(WALK_SPEED_UUID).getAmount() != HandOfGodConfig.walking_speed) {
+                            player.getEntityAttribute(speedAttr).removeModifier(player.getEntityAttribute(speedAttr).getModifier(WALK_SPEED_UUID));
+                            player.getEntityAttribute(speedAttr).applyModifier(new AttributeModifier(WALK_SPEED_UUID, speedAttr.getName(), HandOfGodConfig.walking_speed, 1));
+                        }
+
+                        if (!player.onGround && player.getRidingEntity() == null) {
+                            player.jumpMovementFactor = (float) (0.02F + (0.02F * HandOfGodConfig.walking_speed));
+                        }
+                    }
                 }
                 if (HandOfGodConfig.inertia_cancellation && e.player.moveForward == 0 && e.player.moveStrafing == 0 && e.player.capabilities.isFlying) {
                     e.player.motionX *= 0.5;
@@ -169,6 +205,9 @@ public class TheHandOfGod {
                 e.player.setInvisible(false);
 
                 if (!e.player.world.isRemote) {
+                    if (player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(WALK_SPEED_UUID) != null) {
+                        player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(WALK_SPEED_UUID));
+                    }
                 }
             }
         }
@@ -197,7 +236,7 @@ public class TheHandOfGod {
     public static void entityDrops(LivingDropsEvent e) {
         Entity attacker = e.getSource().getTrueSource();
         if (attacker instanceof EntityLivingBase) {
-            EntityLivingBase livingEntity =  (EntityLivingBase)attacker;
+            EntityLivingBase livingEntity = (EntityLivingBase) attacker;
             if (Util.hasHand(livingEntity)) {
                 if (!HandOfGodConfig.entities_drop_items) {
                     e.getDrops().clear();
@@ -231,7 +270,7 @@ public class TheHandOfGod {
     public static void death(LivingDeathEvent e) {
         EntityLivingBase victim = e.getEntityLiving();
         if (victim instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer)victim;
+            EntityPlayer player = (EntityPlayer) victim;
             if (HandOfGodConfig.inventory_destruction) {
                 player.inventory.clear();
                 player.getInventoryEnderChest().clear();
