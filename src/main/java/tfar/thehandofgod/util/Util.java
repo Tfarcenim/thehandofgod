@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketBlockChange;
@@ -18,6 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.init.ModItems;
@@ -74,6 +77,28 @@ public class Util {
             return player.inventory.hasItemStack(HAND);
         }
         return false;
+    }
+
+    public static ItemStack getHand(EntityPlayer player) {
+            return getSlotFor(player.inventory,HAND);
+    }
+
+
+    /**
+     * Finds the stack or an equivalent one in the main inventory
+     */
+    //the original function is clientside only hooray
+    public static ItemStack getSlotFor(InventoryPlayer inv,ItemStack stack)
+    {
+        for (int i = 0; i < inv.mainInventory.size(); ++i)
+        {
+            if (!inv.mainInventory.get(i).isEmpty() && ItemStack.areItemsEqual(HAND,inv.mainInventory.get(i)))//*inv.stackEqualExact(stack, inv.mainInventory.get(i)))
+            {
+                return inv.mainInventory.get(i);
+            }
+        }
+
+        return ItemStack.EMPTY;
     }
 
     /**

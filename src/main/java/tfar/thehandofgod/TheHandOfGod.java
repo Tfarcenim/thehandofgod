@@ -10,6 +10,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -37,6 +41,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tfar.thehandofgod.client.Client;
@@ -167,19 +172,32 @@ public class TheHandOfGod {
             }
 
             if (Util.hasHand(e.player)) {
-                e.player.capabilities.allowFlying = true;
-                e.player.setInvisible(HandOfGodConfig.true_invisibility);
-                if (e.player.world.isRemote) {
+                player.capabilities.allowFlying = true;
+                player.setInvisible(HandOfGodConfig.true_invisibility);
+                if (player.world.isRemote) {
                     //caution, this is clientside only
-                    e.player.capabilities.setFlySpeed((float) (HandOfGodConfig.flight_speed * .05));
+                    player.capabilities.setFlySpeed((float) (HandOfGodConfig.flight_speed * .05));
                 } else {
 
+                    if (player.world.getTotalWorldTime() % 100 == 0) {
+                        ItemStackHandler potions = Util.getPotionHandler(Util.getHand(player));
+                        for (int i = 0; i < potions.getSlots(); i++) {
+                            ItemStack stack = potions.getStackInSlot(i);
+                            for (PotionEffect potioneffect : PotionUtils.getEffectsFromStack(stack)) {
+                                if (potioneffect.getPotion().isInstant()) {
+                                    potioneffect.getPotion().affectEntity(player, player, player, potioneffect.getAmplifier(), 1.0D);
+                                } else {
+                                    player.addPotionEffect(new PotionEffect(potioneffect));
+                                }
+                            }
+                        }
+                    }
 
                     if (HandOfGodConfig.kill_aura) {
                         double r = HandOfGodConfig.kill_aura_range;
-                        List<Entity> nearby = player.world.getEntitiesWithinAABBExcludingEntity(player,new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
+                        List<Entity> nearby = player.world.getEntitiesWithinAABBExcludingEntity(player, new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
                         for (Entity entityLivingBase : nearby) {
-                                entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player), 1000000);
+                            entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player), 1000000);
                         }
                     }
 
@@ -297,7 +315,7 @@ public class TheHandOfGod {
 
                     HandOfGodConfig.beyond_redemption_player_list = new String[temp.length + 1];
 
-                    for (int i = 0; i < temp.length;i++) {
+                    for (int i = 0; i < temp.length; i++) {
                         HandOfGodConfig.beyond_redemption_player_list[i] = temp[i];
                     }
                     HandOfGodConfig.beyond_redemption_player_list[temp.length] = player.getGameProfile().getId().toString();
