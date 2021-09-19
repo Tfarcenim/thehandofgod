@@ -95,6 +95,22 @@ public class HandOfGodConfig {
     @Config.Comment("Toggle inventory destruction. Clears target's inventory upon kill, including ender chests")
     public static boolean inventory_destruction = true;
 
+    @Config.Name("beyond_redemption")
+    @Config.Comment("Players killed by this cannot respawn (as they are instantly killed).")//I don't think keeping the player from creating any new worlds is very nice
+    public static boolean beyond_redemption = false;
+
+    @Config.Name("beyond_redemption_player_list")
+    public static String[] beyond_redemption_player_list = new String[]{};
+
+    @Config.Name("kill_facing")
+    public static boolean kill_facing = true;
+
+    @Config.Name("kick_player")
+    public static boolean kick_player;
+
+    @Config.Name("kick_message")
+    public static String kick_message = "";
+
     @Config.Name("block_reach_distance")
     public static double block_reach_distance = 5;
 

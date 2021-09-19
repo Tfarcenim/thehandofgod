@@ -10,10 +10,13 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.client.gui.BackpackScreen;
 import tfar.thehandofgod.client.gui.ConfigureEnchantmentScreen;
+import tfar.thehandofgod.client.gui.ConfigurePotionScreen;
 import tfar.thehandofgod.inventory.BiggerItemStackHandler;
 import tfar.thehandofgod.inventory.EnchantmentItemStackHandler;
+import tfar.thehandofgod.inventory.PotionItemStackHandler;
 import tfar.thehandofgod.menu.BackpackContainer;
 import tfar.thehandofgod.menu.ConfigureEnchantmentContainer;
+import tfar.thehandofgod.menu.ConfigurePotionContainer;
 import tfar.thehandofgod.util.Constants;
 import tfar.thehandofgod.util.Util;
 import tfar.thehandofgod.world.saveddata.BackpackData;
@@ -32,9 +35,14 @@ public class GuiHandler implements IGuiHandler {
                 BiggerItemStackHandler handler = data.getOrCreateManagerForPlayer((EntityPlayerMP) player).getOrCreateHandlerForPage(0);
                 return createBackpackMenu(player.inventory,handler);
             }
-            case ENCHANTMENTS:
+            case ENCHANTMENTS: {
                 ItemStackHandler handler = Util.getEnchantmentHandler(player.getHeldItemMainhand());
-                return createEnchantmentMenu(player.inventory,handler);
+                return createEnchantmentMenu(player.inventory, handler);
+            }
+            case POTIONS:{
+                ItemStackHandler handler = Util.getPotionHandler(player.getHeldItemMainhand());
+                return createPotionMenu(player.inventory,handler);
+            }
         }
         return null;
     }
@@ -48,6 +56,8 @@ public class GuiHandler implements IGuiHandler {
                 return new BackpackScreen(createBackpackMenu(player.inventory, new BiggerItemStackHandler(54)));
             case ENCHANTMENTS:
                 return new ConfigureEnchantmentScreen(createEnchantmentMenu(player.inventory,new EnchantmentItemStackHandler(9)));
+            case POTIONS:
+                return new ConfigurePotionScreen(createPotionMenu(player.inventory,new PotionItemStackHandler(9)));
         }
         return null;
     }
@@ -60,4 +70,10 @@ public class GuiHandler implements IGuiHandler {
         ItemStack stack = inv.player.getHeldItemMainhand();
         return new ConfigureEnchantmentContainer(inv,handler,stack);
     }
+
+    private static ConfigurePotionContainer createPotionMenu(InventoryPlayer inv, ItemStackHandler handler) {
+        ItemStack stack = inv.player.getHeldItemMainhand();
+        return new ConfigurePotionContainer(inv,handler,stack);
+    }
+
 }

@@ -7,6 +7,7 @@ import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemEnchantedBook;
@@ -21,6 +22,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.init.ModItems;
 import tfar.thehandofgod.inventory.EnchantmentItemStackHandler;
+import tfar.thehandofgod.inventory.PotionItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +152,17 @@ public class Util {
         return handler;
     }
 
+    public static ItemStackHandler getPotionHandler(ItemStack stack) {
+        ItemStackHandler handler = new PotionItemStackHandler(9);
+        handler.deserializeNBT(stack.getSubCompound("potions"));
+        return handler;
+    }
+
     public static ItemStack createBookFromEnchantment(Enchantment enchantment ,int level) {
         return ItemEnchantedBook.getEnchantedItemStack(new EnchantmentData(enchantment,level));
+    }
+
+    public static boolean isFriendlyMob(Entity entity) {
+        return entity instanceof EntityLivingBase && !(entity instanceof IMob);
     }
 }

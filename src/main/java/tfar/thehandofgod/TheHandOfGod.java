@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.RegistryEvent;
@@ -176,9 +177,9 @@ public class TheHandOfGod {
 
                     if (HandOfGodConfig.kill_aura) {
                         double r = HandOfGodConfig.kill_aura_range;
-                        List<EntityLivingBase> nearby = player.world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
-                        for (EntityLivingBase entityLivingBase : nearby) {
-                            entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player),1000000);
+                        List<Entity> nearby = player.world.getEntitiesWithinAABBExcludingEntity(player,new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
+                        for (Entity entityLivingBase : nearby) {
+                                entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player), 1000000);
                         }
                     }
 
@@ -226,9 +227,12 @@ public class TheHandOfGod {
 
     @SubscribeEvent
     public static void itemDrops(BlockEvent.HarvestDropsEvent e) {
-        ItemStack stack = e.getHarvester().getHeldItemMainhand();
-        if (stack.getItem() instanceof HandOfGodItem && !HandOfGodConfig.blocks_drop_items) {
-            e.getDrops().clear();
+        EntityPlayer harvester = e.getHarvester();
+        if (harvester != null) {
+            ItemStack stack = harvester.getHeldItemMainhand();
+            if (stack.getItem() instanceof HandOfGodItem && !HandOfGodConfig.blocks_drop_items) {
+                e.getDrops().clear();
+            }
         }
     }
 
@@ -269,11 +273,35 @@ public class TheHandOfGod {
     @SubscribeEvent
     public static void death(LivingDeathEvent e) {
         EntityLivingBase victim = e.getEntityLiving();
-        if (victim instanceof EntityPlayer) {
+
+        Entity attacker = e.getSource().getTrueSource();
+
+        if (victim instanceof EntityPlayer && attacker instanceof EntityPlayer) {
+
             EntityPlayer player = (EntityPlayer) victim;
-            if (HandOfGodConfig.inventory_destruction) {
-                player.inventory.clear();
-                player.getInventoryEnderChest().clear();
+            EntityPlayer attack = (EntityPlayer) attacker;
+
+            if (attack.getHeldItemMainhand().getItem() == ModItems.HAND_OF_GOD) {
+
+                if (HandOfGodConfig.inventory_destruction) {
+                    player.inventory.clear();
+                    player.getInventoryEnderChest().clear();
+                }
+                if (HandOfGodConfig.kick_player) {
+                    ((EntityPlayerMP) player).connection.disconnect(new TextComponentString(HandOfGodConfig.kick_message));
+                }
+
+                if (HandOfGodConfig.beyond_redemption) {
+
+                    String[] temp = HandOfGodConfig.beyond_redemption_player_list;
+
+                    HandOfGodConfig.beyond_redemption_player_list = new String[temp.length + 1];
+
+                    for (int i = 0; i < temp.length;i++) {
+                        HandOfGodConfig.beyond_redemption_player_list[i] = temp[i];
+                    }
+                    HandOfGodConfig.beyond_redemption_player_list[temp.length] = player.getGameProfile().getId().toString();
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -118,14 +119,28 @@ public class HandOfGodItem extends Item {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        List<Entity> coneEntities = Util.getEntitiesInCone(player);
-        entity.setDead();
-        coneEntities.forEach(HandOfGodItem::pk);
+        if (HandOfGodConfig.kill_facing) {
+            List<Entity> coneEntities = Util.getEntitiesInCone(player);
+            coneEntities.forEach(HandOfGodItem::pk);
+        }
         return true;
     }
 
     public static void pk(Entity entity) {
-        entity.setDead();
+
+        if (!HandOfGodConfig.kill_friendly && Util.isFriendlyMob(entity)) {
+            return;
+        }
+
+        if (!HandOfGodConfig.kill_all && !(entity instanceof EntityLivingBase)) {
+            return;
+        }
+
+        if (entity instanceof EntityPlayer) {
+
+        } else {
+            entity.setDead();
+        }
         if (HandOfGodConfig.judgement) {
             entity.world.addWeatherEffect(new ColoredLightningEntity(entity.world, entity.posX, entity.posY, entity.posZ, true));
         }
