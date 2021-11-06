@@ -9,6 +9,7 @@ import net.minecraft.client.util.SearchTreeManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
@@ -17,6 +18,7 @@ import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.menu.BadCreativeMenu;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class BadCreativeMenuScreen extends GuiContainer {
@@ -135,19 +137,20 @@ public class BadCreativeMenuScreen extends GuiContainer {
     }
 
     private void updateSearch() {
-        BadCreativeMenu guicontainercreative$containercreative = (BadCreativeMenu) this.inventorySlots;
-        guicontainercreative$containercreative.itemList.clear();
+        BadCreativeMenu badCreativeMenu = (BadCreativeMenu) this.inventorySlots;
+        badCreativeMenu.itemList.clear();
 
         if (this.searchField.getText().isEmpty()) {
             for (Item item : Item.REGISTRY) {
-                item.getSubItems(CreativeTabs.SEARCH, guicontainercreative$containercreative.itemList);
+                item.getSubItems(CreativeTabs.SEARCH, badCreativeMenu.itemList);
             }
         } else {
-            guicontainercreative$containercreative.itemList.addAll(this.mc.getSearchTree(SearchTreeManager.ITEMS).search(this.searchField.getText().toLowerCase(Locale.ROOT)));
+            List<ItemStack> items = this.mc.getSearchTree(SearchTreeManager.ITEMS).search(this.searchField.getText().toLowerCase(Locale.ROOT));
+            badCreativeMenu.itemList.addAll(items);
         }
 
         this.currentScroll = 0.0F;
-        guicontainercreative$containercreative.scrollTo(0.0F);
+        badCreativeMenu.scrollTo(0.0F);
     }
 
 

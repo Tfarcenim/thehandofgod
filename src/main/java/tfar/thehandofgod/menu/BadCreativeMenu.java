@@ -90,14 +90,14 @@ public class BadCreativeMenu extends Container {
      * Updates the gui slots ItemStack's based on scroll position.
      */
     public void scrollTo(float pos) {
-        int i = (this.itemList.size() + 9 - 1) / 9 - 6;
+        int i = (this.itemList.size() + 9 - 1) / 9 - SLOTS/9;
         int j = (int) (pos * i + 0.5D);
 
         if (j < 0) {
             j = 0;
         }
 
-        for (int k = 0; k < 5; ++k) {
+        for (int k = 0; k < SLOTS/9; ++k) {
             for (int l = 0; l < 9; ++l) {
                 int i1 = l + (k + j) * 9;
 
