@@ -8,15 +8,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import tfar.thehandofgod.client.gui.BackpackScreen;
-import tfar.thehandofgod.client.gui.ConfigureEnchantmentScreen;
-import tfar.thehandofgod.client.gui.ConfigurePotionScreen;
+import tfar.thehandofgod.client.gui.*;
 import tfar.thehandofgod.inventory.BiggerItemStackHandler;
 import tfar.thehandofgod.inventory.EnchantmentItemStackHandler;
 import tfar.thehandofgod.inventory.PotionItemStackHandler;
-import tfar.thehandofgod.menu.BackpackContainer;
-import tfar.thehandofgod.menu.ConfigureEnchantmentContainer;
-import tfar.thehandofgod.menu.ConfigurePotionContainer;
+import tfar.thehandofgod.menu.*;
 import tfar.thehandofgod.util.Constants;
 import tfar.thehandofgod.util.Util;
 import tfar.thehandofgod.world.saveddata.BackpackData;
@@ -43,6 +39,11 @@ public class GuiHandler implements IGuiHandler {
                 ItemStackHandler handler = Util.getPotionHandler(player.getHeldItemMainhand());
                 return createPotionMenu(player.inventory,handler);
             }
+            case TELEPORT:{
+                return createTeleportMenu(player.inventory);
+            }
+            case HEAVENLY_POCKET:
+                return createHeavenlyPocket(player.inventory);
         }
         return null;
     }
@@ -58,6 +59,10 @@ public class GuiHandler implements IGuiHandler {
                 return new ConfigureEnchantmentScreen(createEnchantmentMenu(player.inventory,new EnchantmentItemStackHandler(9)));
             case POTIONS:
                 return new ConfigurePotionScreen(createPotionMenu(player.inventory,new PotionItemStackHandler(9)));
+            case TELEPORT:
+                return new TeleportScreen(createTeleportMenu(player.inventory));
+            case HEAVENLY_POCKET:
+                return new BadCreativeMenuScreen(createHeavenlyPocket(player.inventory));
         }
         return null;
     }
@@ -76,4 +81,12 @@ public class GuiHandler implements IGuiHandler {
         return new ConfigurePotionContainer(inv,handler,stack);
     }
 
+    private static TeleportContainer createTeleportMenu(InventoryPlayer inv) {
+        ItemStack stack = inv.player.getHeldItemMainhand();
+        return new TeleportContainer(inv,stack);
+    }
+
+    private static BadCreativeMenu createHeavenlyPocket(InventoryPlayer inv) {
+        return new BadCreativeMenu(inv);
+    }
 }

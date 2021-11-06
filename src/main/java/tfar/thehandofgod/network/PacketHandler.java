@@ -16,5 +16,6 @@ public class PacketHandler {
     INSTANCE.registerMessage(C2SOpenGuiFromKeybindPacket.Handler.class, C2SOpenGuiFromKeybindPacket.class, i++, Side.SERVER);
     INSTANCE.registerMessage(C2SPagePacket.Handler.class, C2SPagePacket.class, i++, Side.SERVER);
     INSTANCE.registerMessage(S2CPagePacket.Handler.class, S2CPagePacket.class, i++, Side.CLIENT);
+    INSTANCE.registerMessage(C2STeleportPacket.Handler.class,C2STeleportPacket.class,i++,Side.SERVER);
   }
 }

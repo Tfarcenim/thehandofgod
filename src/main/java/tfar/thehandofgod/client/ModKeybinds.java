@@ -24,6 +24,9 @@ public class ModKeybinds {
     public static final KeyBinding ENCHANTMENTS = new KeyBinding("Enchantments", Keyboard.KEY_UNLABELED, TheHandOfGod.MODID);
     public static final KeyBinding TIME_STOP = new KeyBinding("time_stop", Keyboard.KEY_Y, TheHandOfGod.MODID);
     public static final KeyBinding POTIONS = new KeyBinding("potion",Keyboard.KEY_Z,TheHandOfGod.MODID);
+    public static final KeyBinding TELEPORT = new KeyBinding("teleport",Keyboard.KEY_P,TheHandOfGod.MODID);
+    public static final KeyBinding HEAVENLY_POCKET = new KeyBinding("heavenly_pocket",Keyboard.KEY_H,TheHandOfGod.MODID);
+
 
     public static void register() {
         for (Field field : ModKeybinds.class.getFields()) {
@@ -50,6 +53,12 @@ public class ModKeybinds {
             }
             while (POTIONS.isPressed()) {
                 PacketHandler.INSTANCE.sendToServer(new C2SOpenGuiFromKeybindPacket(Constants.ScreenType.POTIONS));
+            }
+            while (TELEPORT.isPressed()) {
+                PacketHandler.INSTANCE.sendToServer(new C2SOpenGuiFromKeybindPacket(Constants.ScreenType.TELEPORT));
+            }
+            while (HEAVENLY_POCKET.isPressed()) {
+                PacketHandler.INSTANCE.sendToServer(new C2SOpenGuiFromKeybindPacket(Constants.ScreenType.HEAVENLY_POCKET));
             }
         }
     }
