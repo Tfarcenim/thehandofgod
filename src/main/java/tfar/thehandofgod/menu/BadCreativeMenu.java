@@ -2,12 +2,16 @@ package tfar.thehandofgod.menu;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import tfar.thehandofgod.inventory.LockedSlot;
+
+import java.util.List;
 
 public class BadCreativeMenu extends Container {
 
@@ -15,19 +19,14 @@ public class BadCreativeMenu extends Container {
 
     public final InventoryPlayer playerInventory;
 
-    public final ItemStackHandler handler = new ItemStackHandler(SLOTS);
-
-    /**
-     * the list of items in this container
-     */
-    public NonNullList<ItemStack> itemList = NonNullList.create();
+    protected final ItemStackHandler handler = new ItemStackHandler(SLOTS);
 
     public BadCreativeMenu(InventoryPlayer playerInventory) {
         this.playerInventory = playerInventory;
 
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 9; j++) {
-                this.addSlotToContainer(new SlotItemHandler(handler, j + i * 9, j * 18 + 8, i * 18 + 18));
+                this.addSlotToContainer(new LockedSlot(handler, j + i * 9, j * 18 + 8, i * 18 + 18));
             }
         }
 
@@ -50,6 +49,7 @@ public class BadCreativeMenu extends Container {
      * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
      * inventory and the other inventory(s).
      */
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
@@ -76,38 +76,36 @@ public class BadCreativeMenu extends Container {
         return itemstack;
     }
 
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+            InventoryPlayer inventoryplayer = player.inventory;
+            if (slotId >= 0) {
+                Slot slot = this.inventorySlots.get(slotId);
+                //check for our custom slot
+                if (slot instanceof LockedSlot) {
+                    ItemStack mouseStack = inventoryplayer.getItemStack();
+                    if (mouseStack.isItemEqual(slot.getStack())) {
+                        if (mouseStack.getCount() < mouseStack.getMaxStackSize())
+                        mouseStack.grow(1);
+                    } else if (mouseStack.isEmpty()) {
+                        inventoryplayer.setItemStack(slot.getStack().copy());
+                    } else {
+                        inventoryplayer.setItemStack(ItemStack.EMPTY);
+                    }
+                }
+            }
+        return super.slotClick(slotId, dragType, clickTypeIn, player);
+    }
 
     @Override
     public boolean canInteractWith(EntityPlayer playerIn) {
         return true;
     }
 
-    public boolean canScroll() {
-        return this.itemList.size() > SLOTS;
-    }
-
-    /**
-     * Updates the gui slots ItemStack's based on scroll position.
-     */
-    public void scrollTo(float pos) {
-        int i = (this.itemList.size() + 9 - 1) / 9 - SLOTS/9;
-        int j = (int) (pos * i + 0.5D);
-
-        if (j < 0) {
-            j = 0;
-        }
-
-        for (int k = 0; k < SLOTS/9; ++k) {
-            for (int l = 0; l < 9; ++l) {
-                int i1 = l + (k + j) * 9;
-
-                if (i1 >= 0 && i1 < this.itemList.size()) {
-                    handler.setStackInSlot(l + k * 9, this.itemList.get(i1));
-                } else {
-                    handler.setStackInSlot(l + k * 9, ItemStack.EMPTY);
-                }
-            }
+    public void updateDisplay(List<ItemStack> stacks) {
+        int display = Math.min(BadCreativeMenu.SLOTS,stacks.size());
+        for (int i = 0; i < BadCreativeMenu.SLOTS;i++) {
+            handler.setStackInSlot(i,i < display ? stacks.get(i) : ItemStack.EMPTY);
         }
     }
-
 }
