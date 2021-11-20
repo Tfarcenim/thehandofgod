@@ -12,7 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import search.SearchHelper;
+import tfar.thehandofgod.client.search.SearchHelper;
 import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.menu.BadCreativeMenu;
 import tfar.thehandofgod.network.C2SSendItemStackPacket;
@@ -217,8 +217,10 @@ public class BadCreativeMenuScreen extends GuiContainer {
                 }
                 topRow += scrollDelta;
 
-                topRow = MathHelper.clamp(topRow,0,(int)Math.ceil(totalItems/9d - 6));
+                topRow = MathHelper.clamp(topRow,0,(int)Math.ceil(totalItems/9d - BadCreativeMenu.SLOTS/9));
 
+                //totalItems/9 is the number of rows
+                currentScroll = (float)topRow  / (totalItems/9 - 5);
                 updateSearch(false);
             }
         }

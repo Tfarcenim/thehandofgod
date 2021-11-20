@@ -1,9 +1,10 @@
-package search;
+package tfar.thehandofgod.client.search;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.SearchTreeManager;
 import net.minecraft.item.ItemStack;
 import tfar.thehandofgod.client.Client;
+import tfar.thehandofgod.client.search.color.ColorNamer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 public class SearchHelper {
 
+    public static ColorNamer colorNamer;
 
     public static final Map<Character, SearchTreeManager.Key<ItemStack>> searchKeys = new HashMap<>();
 
@@ -22,10 +24,6 @@ public class SearchHelper {
         searchKeys.put('%',Client.CREATIVE_TAB);
         searchKeys.put('^',Client.COLOR);
         searchKeys.put('&',Client.RESOURCE_ID);
-    }
-
-    public static boolean searchModName(String s) {
-        return false;
     }
 
     public static List<ItemStack> search(String text) {

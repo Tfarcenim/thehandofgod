@@ -1,5 +1,6 @@
 package tfar.thehandofgod.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -30,6 +31,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import tfar.thehandofgod.ColoredLightningEntity;
+import tfar.thehandofgod.client.search.SearchHelper;
+import tfar.thehandofgod.client.search.color.ColorGetter;
+import tfar.thehandofgod.client.search.color.ColorNamer;
 import tfar.thehandofgod.init.ModItems;
 import tfar.thehandofgod.init.ModSounds;
 import tfar.thehandofgod.TheHandOfGod;
@@ -37,7 +41,9 @@ import tfar.thehandofgod.network.C2SStopTimePacket;
 import tfar.thehandofgod.network.PacketHandler;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -79,6 +85,30 @@ public class Client {
     public static void init(FMLInitializationEvent e) {
     }
 
+    public static void buildColorNamer() {
+        final String[] searchColorDefaults = ColorGetter.getColorDefaults();
+        final String[] searchColors = searchColorDefaults;
+
+        final ImmutableMap.Builder<Color, String> searchColorsMapBuilder = ImmutableMap.builder();
+        for (String entry : searchColors) {
+            final String[] values = entry.split(":");
+            if (values.length != 2) {
+                TheHandOfGod.logger.error("Invalid format for searchColor entry: {}", entry);
+            } else {
+                try {
+                    final String name = values[0];
+                    final int colorValue = Integer.decode("0x" + values[1]);
+                    final Color color = new Color(colorValue);
+                    searchColorsMapBuilder.put(color, name);
+                } catch (NumberFormatException e) {
+                    TheHandOfGod.logger.error("Invalid number format for searchColor entry: {}", entry, e);
+                }
+            }
+        }
+        final ColorNamer colorNamer = new ColorNamer(searchColorsMapBuilder.build());
+        SearchHelper.colorNamer = colorNamer;
+    }
+
     public static void onTimeToggle(boolean stop, boolean user) {
         Client.stopped = stop;
         if (stop) {
@@ -94,7 +124,9 @@ public class Client {
     }
 
 
-    public static void registerTrees(SearchTreeManager searchTreeManager) {
+    public static void registerSearchTrees(SearchTreeManager searchTreeManager) {
+
+        buildColorNamer();
 
         searchTreeManager.register(ALL_ITEMS, buildAllItemsSearch());
         searchTreeManager.register(MOD_NAMES, buildModNameSearch());
@@ -182,10 +214,18 @@ public class Client {
     }
 
     private static SearchTree<ItemStack> buildColorSearch() {
-        SearchTree<ItemStack> searchtree = new SearchTree<>(Client::modidAndName, stack ->
+        SearchTree<ItemStack> searchtree = new SearchTree<>(Client::color, stack ->
                 Collections.singleton(Item.REGISTRY.getNameForObject(stack.getItem())));
         finish(searchtree);
         return searchtree;
+    }
+
+    private static Collection<String> color(ItemStack stack) {
+        return SearchHelper.colorNamer.getColorNames(getColors(stack), false);
+    }
+
+    public static Iterable<Color> getColors(ItemStack ingredient) {
+        return ColorGetter.getColors(ingredient, 2);
     }
 
     private static SearchTree<ItemStack> buildResourceIDSearch() {
