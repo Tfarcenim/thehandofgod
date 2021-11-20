@@ -16,6 +16,6 @@ public class MinecraftMixin {
 
     @Inject(method = "populateSearchTreeManager",at = @At("RETURN"))
     private void registerSearch(CallbackInfo ci) {
-        Client.registerTree(this.searchTreeManager);
+        Client.registerTrees(this.searchTreeManager);
     }
 }
