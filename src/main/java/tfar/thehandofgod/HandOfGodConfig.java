@@ -123,6 +123,9 @@ public class HandOfGodConfig {
     @Config.Name("backpack_pages")
     public static int backpack_pages = 10000;
 
+    @Config.Name("archangel_speed")
+    public static int archangelSpeed = 1;
+
     private static String[] getDefaultPotions() {
         return ForgeRegistries.POTIONS.getValuesCollection().stream()
                 .filter(Potion::isBeneficial)

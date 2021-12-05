@@ -31,19 +31,21 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import tfar.thehandofgod.ColoredLightningEntity;
+import tfar.thehandofgod.TheHandOfGod;
+import tfar.thehandofgod.client.render.RenderEntityArchangel;
 import tfar.thehandofgod.client.search.SearchHelper;
 import tfar.thehandofgod.client.search.color.ColorGetter;
 import tfar.thehandofgod.client.search.color.ColorNamer;
+import tfar.thehandofgod.entity.EntityArchangel;
 import tfar.thehandofgod.init.ModItems;
 import tfar.thehandofgod.init.ModSounds;
-import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.network.C2SStopTimePacket;
 import tfar.thehandofgod.network.PacketHandler;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -62,6 +64,10 @@ public class Client {
     @SubscribeEvent
     public static void client(ModelRegistryEvent e) {
         setModel(ModItems.HAND_OF_GOD);
+
+        RenderingRegistry.registerEntityRenderingHandler(ColoredLightningEntity.class, ColoredLightningRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityArchangel.class,
+                RenderEntityArchangel::new);
     }
 
     public static void setModel(Item item) {
@@ -79,10 +85,10 @@ public class Client {
     }
 
     public static void preInit(FMLPreInitializationEvent e) {
-        RenderingRegistry.registerEntityRenderingHandler(ColoredLightningEntity.class, ColoredLightningRenderer::new);
     }
 
     public static void init(FMLInitializationEvent e) {
+//        ObjModelManager.reload();
     }
 
     public static void buildColorNamer() {

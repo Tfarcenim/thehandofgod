@@ -88,7 +88,9 @@ public class BadCreativeMenu extends Container {
                         if (mouseStack.getCount() < mouseStack.getMaxStackSize())
                         mouseStack.grow(1);
                     } else if (mouseStack.isEmpty()) {
-                        inventoryplayer.setItemStack(slot.getStack().copy());
+                        ItemStack newStack = slot.getStack().copy();
+                        newStack.setCount(clickTypeIn == ClickType.QUICK_MOVE ? 64 : 1);
+                        inventoryplayer.setItemStack(newStack);
                     } else {
                         inventoryplayer.setItemStack(ItemStack.EMPTY);
                     }

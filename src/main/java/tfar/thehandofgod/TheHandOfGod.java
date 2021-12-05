@@ -10,9 +10,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
@@ -46,6 +44,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tfar.thehandofgod.client.Client;
 import tfar.thehandofgod.client.ModKeybinds;
+import tfar.thehandofgod.entity.EntityArchangel;
 import tfar.thehandofgod.init.ModEntityTypes;
 import tfar.thehandofgod.init.ModItems;
 import tfar.thehandofgod.init.ModSounds;
@@ -197,6 +196,8 @@ public class TheHandOfGod {
                         double r = HandOfGodConfig.kill_aura_range;
                         List<Entity> nearby = player.world.getEntitiesWithinAABBExcludingEntity(player, new AxisAlignedBB(player.posX - r, player.posY - r, player.posZ - r, player.posX + r, player.posY + r, player.posZ + r));
                         for (Entity entityLivingBase : nearby) {
+                            //currently hurts everything except the player and archangels
+                            if (!(entityLivingBase instanceof EntityArchangel))
                             entityLivingBase.attackEntityFrom(DamageSource.causePlayerDamage(player), 1000000);
                         }
                     }
