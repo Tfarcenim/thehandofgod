@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,6 +28,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import tfar.thehandofgod.client.font.RainbowFontRenderer;
 import tfar.thehandofgod.util.Util;
 
 import javax.annotation.Nullable;
@@ -265,5 +267,11 @@ public class HandOfGodItem extends Item {
         Multimap<String, AttributeModifier> multiMap = super.getItemAttributeModifiers(equipmentSlot);
         multiMap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(REACH_DISTANCE_MODIFIER, "Weapon modifier", HandOfGodConfig.block_reach_distance, 0));
         return multiMap;
+    }
+
+    @Nullable
+    @Override
+    public FontRenderer getFontRenderer(ItemStack stack) {
+        return RainbowFontRenderer.get();
     }
 }

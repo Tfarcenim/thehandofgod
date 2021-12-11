@@ -8,6 +8,7 @@ import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ITeleporter;
@@ -15,11 +16,13 @@ import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.entity.ai.*;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class EntityArchangel extends EntityCreature implements IEntityArchangel {
 
     public boolean dimChanging;
     private boolean summoned;
+    private UUID owner = new UUID(0,0);
 
     public EntityArchangel(World worldIn) {
         super(worldIn);
@@ -105,11 +108,6 @@ public class EntityArchangel extends EntityCreature implements IEntityArchangel 
     }
 
     @Override
-    public boolean isChild() {
-        return false;
-    }
-
-    @Override
     protected void handleJumpWater() {
         this.motionY += 0.04;
     }
@@ -133,6 +131,18 @@ public class EntityArchangel extends EntityCreature implements IEntityArchangel 
     }
 
     @Override
+    public void writeEntityToNBT(NBTTagCompound compound) {
+        super.writeEntityToNBT(compound);
+        compound.setUniqueId("owner",owner);
+    }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
+        owner = compound.getUniqueId("owner");
+    }
+
+    @Override
     public boolean attackEntityAsMob(Entity entity) {
       //  ItemLoader.handOfGod.leftClickEntity(this, entity);
         return true;
@@ -144,14 +154,11 @@ public class EntityArchangel extends EntityCreature implements IEntityArchangel 
         return super.changeDimension(dimensionIn, teleporter);
     }
 
-    @Override
-    public void onRemovedFromWorld() {
-        if (!summoned && !world.isRemote) {
-            EntityArchangel archangel = new EntityArchangel(world);
-            archangel.copyLocationAndAnglesFrom(this);
-            world.spawnEntity(archangel);
-            summoned = true;
-        }
-        super.onRemovedFromWorld();
+    public boolean isOwner(EntityPlayer player) {
+        return player.getGameProfile().getId().equals(owner);
+    }
+
+    public void setOwner(EntityPlayer player) {
+        owner = player.getGameProfile().getId();
     }
 }

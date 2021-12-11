@@ -1,6 +1,5 @@
 package tfar.thehandofgod;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
@@ -12,11 +11,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import tfar.thehandofgod.client.Client;
-import tfar.thehandofgod.client.search.SearchHelper;
-import tfar.thehandofgod.client.search.color.ColorGetter;
-import tfar.thehandofgod.client.search.color.ColorNamer;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -144,19 +139,23 @@ public class HandOfGodConfig {
         }
 
         if (worldActive && perfect_cleanse) {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            server.getWorld(0).getGameRules().setOrCreateGameRule("doMobSpawning","false");
-            for (WorldServer serverWorld : server.worlds) {
-                for (Entity entity : serverWorld.loadedEntityList) {
-                    if (!(entity instanceof EntityPlayerMP)) {
-                        entity.setDead();
-                    }
-                }
-            }
+            cleanse();
         }
 
         if (FMLCommonHandler.instance().getSide().isClient()) {
             Client.buildColorNamer();
+        }
+    }
+
+    public static void cleanse() {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        server.getWorld(0).getGameRules().setOrCreateGameRule("doMobSpawning","false");
+        for (WorldServer serverWorld : server.worlds) {
+            for (Entity entity : serverWorld.loadedEntityList) {
+                if (!(entity instanceof EntityPlayerMP)) {
+                    entity.setDead();
+                }
+            }
         }
     }
 }
