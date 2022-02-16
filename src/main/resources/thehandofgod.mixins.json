@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "thehandofgod.refmap.json",
   "mixins": [
+    "EntityMixin",
     "EntityPlayerMPMixin",
     "EntityPlayerSPMixin",
     "MinecraftMixin",

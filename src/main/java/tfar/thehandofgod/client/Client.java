@@ -3,6 +3,7 @@ package tfar.thehandofgod.client;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -10,6 +11,7 @@ import net.minecraft.client.util.SearchTree;
 import net.minecraft.client.util.SearchTreeManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemAir;
 import net.minecraft.item.ItemStack;
@@ -19,6 +21,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Loader;
@@ -30,7 +33,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
+import org.lwjgl.opengl.GL11;
 import tfar.thehandofgod.ColoredLightningEntity;
+import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.TheHandOfGod;
 import tfar.thehandofgod.client.render.RenderEntityArchangel;
 import tfar.thehandofgod.client.search.SearchHelper;
@@ -41,8 +46,8 @@ import tfar.thehandofgod.init.ModItems;
 import tfar.thehandofgod.init.ModSounds;
 import tfar.thehandofgod.network.C2SStopTimePacket;
 import tfar.thehandofgod.network.PacketHandler;
+import tfar.thehandofgod.util.Util;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
@@ -81,6 +86,28 @@ public class Client {
             Minecraft.getMinecraft().world.playSound(Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.getPosition(),
                     sound, SoundCategory.BLOCKS, 1.2F, 1);
             PacketHandler.INSTANCE.sendToServer(new C2SStopTimePacket());
+        }
+    }
+
+    @SubscribeEvent
+    public static void renderTrueVision(RenderLivingEvent.Pre<EntityLivingBase> event) {
+        boolean hand = false && Util.hasHand(Minecraft.getMinecraft().player);
+        if (HandOfGodConfig.true_vision && hand && event.getEntity() != Minecraft.getMinecraft().player) {
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            GlStateManager.enablePolygonOffset();
+            GlStateManager.doPolygonOffset(1.0F, -1000000);
+            GlStateManager.enableOutlineMode(16711680);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPostRenderLiving(RenderLivingEvent.Post<EntityLivingBase> event) {
+        boolean hand = false && Util.hasHand(Minecraft.getMinecraft().player);
+        if (HandOfGodConfig.true_vision && hand && event.getEntity() != Minecraft.getMinecraft().player) {
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
+            GlStateManager.doPolygonOffset(1.0F, 1000000);
+            GlStateManager.disablePolygonOffset();
+            GlStateManager.disableOutlineMode();
         }
     }
 

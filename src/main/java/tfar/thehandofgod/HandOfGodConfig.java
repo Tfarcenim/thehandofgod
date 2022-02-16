@@ -45,6 +45,9 @@ public class HandOfGodConfig {
     @Config.Name("true_invisibility")
     public static boolean true_invisibility = true;
 
+    @Config.Name("true_vision")
+    public static boolean true_vision = true;
+
     @Config.Name("blocks_drop_items")
     public static boolean blocks_drop_items = true;
 
