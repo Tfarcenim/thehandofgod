@@ -19,8 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemStackHandler;
 import tfar.thehandofgod.HandOfGodConfig;
 import tfar.thehandofgod.init.ModItems;
@@ -179,7 +177,9 @@ public class Util {
 
     public static ItemStackHandler getPotionHandler(ItemStack stack) {
         ItemStackHandler handler = new PotionItemStackHandler(9);
-        handler.deserializeNBT(stack.getSubCompound("potions"));
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("potions")) {
+            handler.deserializeNBT(stack.getSubCompound("potions"));
+        }
         return handler;
     }
 
